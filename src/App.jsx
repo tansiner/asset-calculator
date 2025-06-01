@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 function App() {
     const [btcPrice, setBtcPrice] = useState(null);
@@ -11,13 +11,13 @@ function App() {
     const [totalTry, setTotalTry] = useState(() => localStorage.getItem("totalTry") || "0.00");
 
     useEffect(() => {
-        axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
-            .then(response => setBtcPrice(response.data.bitcoin.usd))
-            .catch(error => console.error('Error fetching BTC data:', error));
+        axios.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
+            .then((response) => setBtcPrice(response.data.bitcoin.usd))
+            .catch((error) => console.error("Error fetching BTC data:", error));
 
-        axios.get('https://api.exchangerate-api.com/v4/latest/USD')
-            .then(response => setUsdToTryRate(response.data.rates.TRY))
-            .catch(error => console.error('Error fetching USD to TRY rate:', error));
+        axios.get("https://api.exchangerate-api.com/v4/latest/USD")
+            .then((response) => setUsdToTryRate(response.data.rates.TRY))
+            .catch((error) => console.error("Error fetching USD to TRY rate:", error));
     }, []);
 
     useEffect(() => {
@@ -54,31 +54,39 @@ function App() {
     };
 
     return (
-        <div style={{ textAlign: 'center', marginTop: '50px' }}>
-            <h1>Live BTC to USD & TRY Converter</h1>
-            <p>Current BTC Price: {btcPrice ? `$${btcPrice}` : 'Loading...'}</p>
-            <p>USD to TRY Rate: {usdToTryRate ? `₺${usdToTryRate}` : 'Loading...'}</p>
+        <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-8">
+            <h1 className="text-3xl font-bold mb-4">Live BTC to USD & TRY Converter</h1>
+            <p className="text-lg mb-2">Current BTC Price: {btcPrice ? `$${btcPrice}` : "Loading..."}</p>
+            <p className="text-lg mb-6">USD to TRY Rate: {usdToTryRate ? `₺${usdToTryRate}` : "Loading..."}</p>
 
             {btcAmounts.map((amount, index) => (
-                <div key={index} style={{ marginBottom: '20px' }}>
+                <div key={index} className="mb-4 flex flex-col items-center">
                     <input
                         type="number"
+                        className="p-2 text-black rounded w-64 mb-2"
                         placeholder={`Enter BTC amount ${index + 1}`}
                         value={amount}
                         onChange={(e) => handleChange(index, e.target.value)}
                     />
-                    <button onClick={() => handleCalculate(index)}>Convert</button>
+                    <button
+                        onClick={() => handleCalculate(index)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                    >
+                        Convert
+                    </button>
                     {usdResults[index] && (
-                        <>
-                            <p>USD Equivalent: ${usdResults[index]}</p>
-                            <p>TRY Equivalent: ₺{tryResults[index]}</p>
-                        </>
+                        <div className="mt-2 text-lg">
+                            <p>USD Equivalent: <span className="text-green-400">${usdResults[index]}</span></p>
+                            <p>TRY Equivalent: <span className="text-yellow-400">₺{tryResults[index]}</span></p>
+                        </div>
                     )}
                 </div>
             ))}
 
-            <h2>Total USD Amount: ${totalUsd}</h2>
-            <h2>Total TRY Amount: ₺{totalTry}</h2>
+            <div className="mt-6 text-2xl font-semibold">
+                <p>Total USD Amount: <span className="text-green-400">${totalUsd}</span></p>
+                <p>Total TRY Amount: <span className="text-yellow-400">₺{totalTry}</span></p>
+            </div>
         </div>
     );
 }
