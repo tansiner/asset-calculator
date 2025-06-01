@@ -10,19 +10,24 @@ function App() {
     const [totalUsd, setTotalUsd] = useState(() => localStorage.getItem("totalUsd") || "0.00");
     const [totalTry, setTotalTry] = useState(() => localStorage.getItem("totalTry") || "0.00");
 
+    const [useManualPrice, setUseManualPrice] = useState(() => JSON.parse(localStorage.getItem("useManualPrice")) || false);
+    const [manualBtcPrice, setManualBtcPrice] = useState(() => localStorage.getItem("manualBtcPrice") || "");
+
     useEffect(() => {
         axios.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
-            .then((response) => setBtcPrice(response.data.bitcoin.usd))
-            .catch((error) => console.error("Error fetching BTC data:", error));
+            .then(response => setBtcPrice(response.data.bitcoin.usd))
+            .catch(error => console.error("Error fetching BTC data:", error));
 
         axios.get("https://api.exchangerate-api.com/v4/latest/USD")
-            .then((response) => setUsdToTryRate(response.data.rates.TRY))
-            .catch((error) => console.error("Error fetching USD to TRY rate:", error));
+            .then(response => setUsdToTryRate(response.data.rates.TRY))
+            .catch(error => console.error("Error fetching USD to TRY rate:", error));
     }, []);
 
     useEffect(() => {
         localStorage.setItem("btcAmounts", JSON.stringify(btcAmounts));
-    }, [btcAmounts]);
+        localStorage.setItem("useManualPrice", JSON.stringify(useManualPrice));
+        localStorage.setItem("manualBtcPrice", manualBtcPrice);
+    }, [btcAmounts, useManualPrice, manualBtcPrice]);
 
     useEffect(() => {
         localStorage.setItem("totalUsd", totalUsd);
@@ -30,9 +35,11 @@ function App() {
     }, [totalUsd, totalTry]);
 
     const handleCalculate = (index) => {
-        if (btcPrice && btcAmounts[index]) {
+        const selectedPrice = useManualPrice && manualBtcPrice ? parseFloat(manualBtcPrice) : btcPrice;
+
+        if (selectedPrice && btcAmounts[index]) {
             const updatedUsdResults = [...usdResults];
-            updatedUsdResults[index] = (btcAmounts[index] * btcPrice).toFixed(2);
+            updatedUsdResults[index] = (btcAmounts[index] * selectedPrice).toFixed(2);
             setUsdResults(updatedUsdResults);
 
             const updatedTryResults = [...tryResults];
@@ -56,7 +63,29 @@ function App() {
     return (
         <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-8">
             <h1 className="text-3xl font-bold mb-4">Live BTC to USD & TRY Converter</h1>
-            <p className="text-lg mb-2">Current BTC Price: {btcPrice ? `$${btcPrice}` : "Loading..."}</p>
+
+            <div className="flex items-center gap-4 mb-6">
+                <label className="text-lg">Use Manual BTC Price:</label>
+                <input
+                    type="checkbox"
+                    checked={useManualPrice}
+                    onChange={() => setUseManualPrice(!useManualPrice)}
+                    className="cursor-pointer"
+                />
+            </div>
+
+            {useManualPrice ? (
+                <input
+                    type="number"
+                    className="p-2 text-black rounded w-64 mb-4"
+                    placeholder="Enter BTC Price"
+                    value={manualBtcPrice}
+                    onChange={(e) => setManualBtcPrice(e.target.value)}
+                />
+            ) : (
+                <p className="text-lg mb-4">Current BTC Price (API): {btcPrice ? `$${btcPrice}` : "Loading..."}</p>
+            )}
+
             <p className="text-lg mb-6">USD to TRY Rate: {usdToTryRate ? `₺${usdToTryRate}` : "Loading..."}</p>
 
             {btcAmounts.map((amount, index) => (
