@@ -34,16 +34,14 @@ function App() {
         localStorage.setItem("totalTry", totalTry);
     }, [totalUsd, totalTry]);
 
-    const handleCalculate = (index) => {
+    const handleCalculateAll = () => {
         const selectedPrice = useManualPrice && manualBtcPrice ? parseFloat(manualBtcPrice) : btcPrice;
 
-        if (selectedPrice && btcAmounts[index]) {
-            const updatedUsdResults = [...usdResults];
-            updatedUsdResults[index] = (btcAmounts[index] * selectedPrice).toFixed(2);
+        if (selectedPrice) {
+            const updatedUsdResults = btcAmounts.map(amount => (amount * selectedPrice).toFixed(2));
             setUsdResults(updatedUsdResults);
 
-            const updatedTryResults = [...tryResults];
-            updatedTryResults[index] = usdToTryRate ? (updatedUsdResults[index] * usdToTryRate).toFixed(2) : "Loading...";
+            const updatedTryResults = updatedUsdResults.map(usd => usdToTryRate ? (usd * usdToTryRate).toFixed(2) : "Loading...");
             setTryResults(updatedTryResults);
 
             const newTotalUsd = updatedUsdResults.reduce((sum, value) => sum + (parseFloat(value) || 0), 0).toFixed(2);
@@ -97,9 +95,6 @@ function App() {
                         onChange={(e) => handleChange(index, e.target.value)}
                         style={{ padding: "5px" }}
                     />
-                    <button onClick={() => handleCalculate(index)} style={{ marginLeft: "10px", padding: "5px" }}>
-                        Convert
-                    </button>
                     {usdResults[index] && (
                         <>
                             <p>USD Equivalent: ${usdResults[index]}</p>
@@ -108,6 +103,10 @@ function App() {
                     )}
                 </div>
             ))}
+
+            <button onClick={handleCalculateAll} style={{ padding: "10px", fontSize: "16px", marginTop: "20px" }}>
+                Convert All
+            </button>
 
             <h2>Total USD Amount: ${totalUsd}</h2>
             <h2>Total TRY Amount: ₺{totalTry}</h2>
