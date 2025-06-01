@@ -61,61 +61,56 @@ function App() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-8">
-            <h1 className="text-3xl font-bold mb-4">Live BTC to USD & TRY Converter</h1>
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
+            <h1>Live BTC to USD & TRY Converter</h1>
 
-            <div className="flex items-center gap-4 mb-6">
-                <label className="text-lg">Use Manual BTC Price:</label>
+            <div style={{ marginBottom: "20px" }}>
+                <label>Use Manual BTC Price:</label>
                 <input
                     type="checkbox"
                     checked={useManualPrice}
                     onChange={() => setUseManualPrice(!useManualPrice)}
-                    className="cursor-pointer"
+                    style={{ marginLeft: "10px" }}
                 />
             </div>
 
             {useManualPrice ? (
                 <input
                     type="number"
-                    className="p-2 text-black rounded w-64 mb-4"
                     placeholder="Enter BTC Price"
                     value={manualBtcPrice}
                     onChange={(e) => setManualBtcPrice(e.target.value)}
+                    style={{ padding: "5px", marginBottom: "10px" }}
                 />
             ) : (
-                <p className="text-lg mb-4">Current BTC Price (API): {btcPrice ? `$${btcPrice}` : "Loading..."}</p>
+                <p>Current BTC Price (API): {btcPrice ? `$${btcPrice}` : "Loading..."}</p>
             )}
 
-            <p className="text-lg mb-6">USD to TRY Rate: {usdToTryRate ? `₺${usdToTryRate}` : "Loading..."}</p>
+            <p>USD to TRY Rate: {usdToTryRate ? `₺${usdToTryRate}` : "Loading..."}</p>
 
             {btcAmounts.map((amount, index) => (
-                <div key={index} className="mb-4 flex flex-col items-center">
+                <div key={index} style={{ marginBottom: "20px" }}>
                     <input
                         type="number"
-                        className="p-2 text-black rounded w-64 mb-2"
                         placeholder={`Enter BTC amount ${index + 1}`}
                         value={amount}
                         onChange={(e) => handleChange(index, e.target.value)}
+                        style={{ padding: "5px" }}
                     />
-                    <button
-                        onClick={() => handleCalculate(index)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-                    >
+                    <button onClick={() => handleCalculate(index)} style={{ marginLeft: "10px", padding: "5px" }}>
                         Convert
                     </button>
                     {usdResults[index] && (
-                        <div className="mt-2 text-lg">
-                            <p>USD Equivalent: <span className="text-green-400">${usdResults[index]}</span></p>
-                            <p>TRY Equivalent: <span className="text-yellow-400">₺{tryResults[index]}</span></p>
-                        </div>
+                        <>
+                            <p>USD Equivalent: ${usdResults[index]}</p>
+                            <p>TRY Equivalent: ₺{tryResults[index]}</p>
+                        </>
                     )}
                 </div>
             ))}
 
-            <div className="mt-6 text-2xl font-semibold">
-                <p>Total USD Amount: <span className="text-green-400">${totalUsd}</span></p>
-                <p>Total TRY Amount: <span className="text-yellow-400">₺{totalTry}</span></p>
-            </div>
+            <h2>Total USD Amount: ${totalUsd}</h2>
+            <h2>Total TRY Amount: ₺{totalTry}</h2>
         </div>
     );
 }
