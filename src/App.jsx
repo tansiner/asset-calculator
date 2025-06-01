@@ -6,6 +6,7 @@ function App() {
     const [usdToTryRate, setUsdToTryRate] = useState(null);
     const [btcAmounts, setBtcAmounts] = useState(() => JSON.parse(localStorage.getItem("btcAmounts")) || ["", "", ""]);
     const [usdResults, setUsdResults] = useState(["", "", ""]);
+    const [tryResults, setTryResults] = useState(["", "", ""]);
     const [totalUsd, setTotalUsd] = useState(() => localStorage.getItem("totalUsd") || "0.00");
     const [totalTry, setTotalTry] = useState(() => localStorage.getItem("totalTry") || "0.00");
 
@@ -30,14 +31,18 @@ function App() {
 
     const handleCalculate = (index) => {
         if (btcPrice && btcAmounts[index]) {
-            const updatedResults = [...usdResults];
-            updatedResults[index] = (btcAmounts[index] * btcPrice).toFixed(2);
-            setUsdResults(updatedResults);
+            const updatedUsdResults = [...usdResults];
+            updatedUsdResults[index] = (btcAmounts[index] * btcPrice).toFixed(2);
+            setUsdResults(updatedUsdResults);
 
-            const newTotalUsd = updatedResults.reduce((sum, value) => sum + (parseFloat(value) || 0), 0).toFixed(2);
+            const updatedTryResults = [...tryResults];
+            updatedTryResults[index] = usdToTryRate ? (updatedUsdResults[index] * usdToTryRate).toFixed(2) : "Loading...";
+            setTryResults(updatedTryResults);
+
+            const newTotalUsd = updatedUsdResults.reduce((sum, value) => sum + (parseFloat(value) || 0), 0).toFixed(2);
             setTotalUsd(newTotalUsd);
 
-            const newTotalTry = usdToTryRate ? (newTotalUsd * usdToTryRate).toFixed(2) : 'Loading...';
+            const newTotalTry = usdToTryRate ? (newTotalUsd * usdToTryRate).toFixed(2) : "Loading...";
             setTotalTry(newTotalTry);
         }
     };
@@ -63,7 +68,12 @@ function App() {
                         onChange={(e) => handleChange(index, e.target.value)}
                     />
                     <button onClick={() => handleCalculate(index)}>Convert</button>
-                    {usdResults[index] && <p>USD Equivalent: ${usdResults[index]}</p>}
+                    {usdResults[index] && (
+                        <>
+                            <p>USD Equivalent: ${usdResults[index]}</p>
+                            <p>TRY Equivalent: ₺{tryResults[index]}</p>
+                        </>
+                    )}
                 </div>
             ))}
 
