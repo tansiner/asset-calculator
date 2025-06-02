@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
     const [btcPrice, setBtcPrice] = useState(null);
@@ -9,7 +10,6 @@ function App() {
     const [tryResults, setTryResults] = useState(["", "", ""]);
     const [totalUsd, setTotalUsd] = useState(() => localStorage.getItem("totalUsd") || "0.00");
     const [totalTry, setTotalTry] = useState(() => localStorage.getItem("totalTry") || "0.00");
-
     const [useManualPrice, setUseManualPrice] = useState(() => JSON.parse(localStorage.getItem("useManualPrice")) || false);
     const [manualBtcPrice, setManualBtcPrice] = useState(() => localStorage.getItem("manualBtcPrice") || "");
 
@@ -59,57 +59,62 @@ function App() {
     };
 
     return (
-        <div style={{ textAlign: "center", marginTop: "50px" }}>
-            <h1>Live BTC to USD & TRY Converter</h1>
+        <div className="container text-center mt-5">
+            <h1 className="mb-4">Live BTC to USD & TRY Converter</h1>
 
-            <div style={{ marginBottom: "20px" }}>
-                <label>Use Manual BTC Price:</label>
-                <input
-                    type="checkbox"
-                    checked={useManualPrice}
-                    onChange={() => setUseManualPrice(!useManualPrice)}
-                    style={{ marginLeft: "10px" }}
+            <div className="form-check form-switch mb-3">
+                <label className="form-check-label">Use Manual BTC Price:</label>
+                <input 
+                    type="checkbox" 
+                    className="form-check-input" 
+                    checked={useManualPrice} 
+                    onChange={() => setUseManualPrice(!useManualPrice)} 
                 />
             </div>
 
             {useManualPrice ? (
                 <input
                     type="number"
+                    className="form-control mb-4"
                     placeholder="Enter BTC Price"
                     value={manualBtcPrice}
                     onChange={(e) => setManualBtcPrice(e.target.value)}
-                    style={{ padding: "5px", marginBottom: "10px" }}
                 />
             ) : (
                 <p>Current BTC Price (API): {btcPrice ? `$${btcPrice}` : "Loading..."}</p>
             )}
 
-            <p>USD to TRY Rate: {usdToTryRate ? `₺${usdToTryRate}` : "Loading..."}</p>
+            <p className="mb-3">USD to TRY Rate: {usdToTryRate ? `₺${usdToTryRate}` : "Loading..."}</p>
 
-            {btcAmounts.map((amount, index) => (
-                <div key={index} style={{ marginBottom: "20px" }}>
+            {["Binance", "Binance TR", "BTCTurk"].map((label, index) => (
+                <div key={index} className="mb-4">
+                    <label className="form-label">{label}</label>
                     <input
                         type="number"
-                        placeholder={`Enter BTC amount ${index + 1}`}
-                        value={amount}
+                        className="form-control"
+                        placeholder={`Enter BTC amount for ${label}`}
+                        value={btcAmounts[index]}
                         onChange={(e) => handleChange(index, e.target.value)}
-                        style={{ padding: "5px" }}
                     />
                     {usdResults[index] && (
-                        <>
-                            <p>USD Equivalent: ${usdResults[index]}</p>
-                            <p>TRY Equivalent: ₺{tryResults[index]}</p>
-                        </>
+                        <div className="mt-2">
+                            <p>USD Equivalent: <strong>${usdResults[index]}</strong></p>
+                            <p>TRY Equivalent: <strong>₺{tryResults[index]}</strong></p>
+                        </div>
                     )}
                 </div>
             ))}
 
-            <button onClick={handleCalculateAll} style={{ padding: "10px", fontSize: "16px", marginTop: "20px" }}>
+            <button 
+                onClick={handleCalculateAll} 
+                className="btn btn-primary mt-3">
                 Convert All
             </button>
 
-            <h2>Total USD Amount: ${totalUsd}</h2>
-            <h2>Total TRY Amount: ₺{totalTry}</h2>
+            <div className="mt-4">
+                <h2>Total USD Amount: <span className="text-success">${totalUsd}</span></h2>
+                <h2>Total TRY Amount: <span className="text-warning">₺{totalTry}</span></h2>
+            </div>
         </div>
     );
 }
